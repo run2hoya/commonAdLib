@@ -5,10 +5,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.net.ssl.*;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 @Slf4j
 public class HttpConnectorUtil {
@@ -160,6 +165,80 @@ public class HttpConnectorUtil {
 		return getResponse(url, HTTP_POST_METHOD, requestBody, timeout);
 	}
 
+	public static void disableSslVerification(){
+		try
+		{
+			// Create a trust manager that does not validate certificate chains
+			TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
+				public void checkClientTrusted(X509Certificate[] certs, String authType){
+				}
+				public void checkServerTrusted(X509Certificate[] certs, String authType){
+				}
+			}
+			};
+
+			// Install the all-trusting trust manager
+			SSLContext sc = SSLContext.getInstance("TLSv1.2");
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+			// Create all-trusting host name verifier
+			HostnameVerifier allHostsValid = new HostnameVerifier() {
+				public boolean verify(String hostname, SSLSession session){
+					return true;
+				}
+			};
+
+			// Install the all-trusting host verifier
+			HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static InputStream getResponseHttps(URL url, String requestMethod, String requestBody, int timeout) throws Exception {
+
+
+		disableSslVerification();
+
+		HttpsURLConnection urlConn = (HttpsURLConnection) url.openConnection();
+		urlConn.setRequestMethod( requestMethod );
+		urlConn.setDoInput( true );
+		urlConn.setDoOutput( true );
+		urlConn.setUseCaches( false );
+
+		if(timeout > 0)
+		{
+			urlConn.setConnectTimeout(timeout);		//tomcat서버에 접속할때까지의 timeout
+			urlConn.setReadTimeout(timeout);			//tomcat에서 response 받을때까지의 timeout
+		}
+
+
+		// Send Get Method output.
+		if((requestMethod.equals(HTTP_POST_METHOD) || requestMethod.equals(HTTP_PUT_METHOD)) && requestBody != null)
+		{
+			urlConn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+			DataOutputStream wr = new DataOutputStream(urlConn.getOutputStream());
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(wr, "UTF-8"));
+			writer.write(requestBody);
+			writer.close();
+			wr.close();
+		}
+
+		if(urlConn.getResponseCode() == HttpURLConnection.HTTP_OK){
+			return urlConn.getInputStream();
+		} else {
+			log.error(String.format("External System(%s) tomcat error : response code[%s], response message[%s]",
+					url.getPath(), urlConn.getResponseCode(), urlConn.getResponseMessage()));
+
+			return null;
+		}
+	}
 	public static InputStream getResponse(URL url, String requestMethod, String requestBody, int timeout) throws Exception {
 		
 		HttpURLConnection	urlConn = null;

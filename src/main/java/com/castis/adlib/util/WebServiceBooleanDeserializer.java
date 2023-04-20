@@ -26,4 +26,5 @@ public class WebServiceBooleanDeserializer implements JsonDeserializer<Boolean> 
 		}
 		return null;
 	}
+
 }

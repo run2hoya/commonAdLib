@@ -11,8 +11,8 @@ public class IdGenerator implements EntityIdGenerator {
 //   timestamp |datacenter | sequence
 
 	private int datacenterId = 1;
-    private final int maxDatacenterId = 10;
-    private final long sequenceMax = 1000;
+    private final int maxDatacenterId = 30;
+    private final long sequenceMax = 10000;
     private final int sleepTime = 100;
 
     private volatile long lastTimestamp = -1L;
@@ -56,7 +56,7 @@ public class IdGenerator implements EntityIdGenerator {
         lastTimestamp = timestamp;
         lastTimeStr = currentTimeStr;
         
-        return lastTimeStr + datacenterId + String.format("%03d", sequence);
+        return lastTimeStr + datacenterId + String.format("%04d", sequence);
     }
 
     protected String untilNextSec(String lastTime) {
