@@ -1,6 +1,7 @@
 package com.castis.adlib.util;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
  
@@ -27,7 +28,14 @@ public class StringUtil {
 		
 		return num;
 	}
-	
+	public static String getCurrentTimeString(String pattern) {
+
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+		String result = formatter.format(date);
+		return result;
+	}
+
 	public static int stringToMinimizedInterger(String str, int minimum){
 		int result = minimum;
 		try {
@@ -84,12 +92,7 @@ public class StringUtil {
       
         return result;
     }
-    
-    /**
-     * 문자열이 Integer 로 변환될 수 있는지 확인
-     * @param 체크 할 문자열
-     * @return 가능/불가능
-     */
+
     public static boolean ableToConvertInteger(String str) {
 		try {
 			Integer.parseInt(str);
@@ -184,13 +187,7 @@ public class StringUtil {
 		
 		return conv;
 	}
-	
-	/**
-     * 널문자이면 해당  Boolean으로 변환
-     * @param str 문자열
-     * @param conv 변환Boolean형
-     * @return 변환Boolean형
-     */
+
 	public static Boolean nullToBoolean(String parameter, Boolean conv){
 		if(parameter == null || parameter.equals(""))
 			return conv;
