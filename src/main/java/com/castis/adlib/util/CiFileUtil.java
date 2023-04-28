@@ -457,11 +457,28 @@ public class CiFileUtil {
 		
 		return dir;
 	}
+
+	public String getFileNameWithTime(File file) {
+		//파일이름에 작업일추가
+		String curDate = DateUtil.date2String(new Date(System.currentTimeMillis()),"yyyyMMddHHmmss");
+
+		String fileName = file.getName();
+		String newFileName = fileName;
+		int index = fileName.lastIndexOf(".");
+		if (index != -1) {
+			String name = fileName.substring(0, index);
+			String ext  = fileName.substring(index + 1);
+			newFileName = StringUtil.makeString(name, "_", curDate, ".", ext);
+		}
+
+		return newFileName;
+	}
 	
 	public static boolean moveFileToDirectory(String sourceDir,	String destDir, String fileName) throws Exception{
 		
 		return moveFileToDirectory(sourceDir, destDir, fileName, true);
 	}
+
 
 	public static boolean moveFileToDirectory(String strSrcDir,	String strDestDir, String fileName, boolean createDestDir) throws Exception{
 		 

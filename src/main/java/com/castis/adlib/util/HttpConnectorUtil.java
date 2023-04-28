@@ -273,7 +273,6 @@ public class HttpConnectorUtil {
 		} else {
 			log.error(String.format("External System(%s) tomcat error : response code[%s], response message[%s]", 
 					url.getPath(), urlConn.getResponseCode(), urlConn.getResponseMessage()));
-							
 			return null;
 		}
 	}

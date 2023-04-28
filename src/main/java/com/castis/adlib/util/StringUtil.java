@@ -1,6 +1,9 @@
 package com.castis.adlib.util;
 
+import com.google.gson.JsonPrimitive;
+
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -11,6 +14,24 @@ import java.util.*;
  * Static 멤버 변수들로 구성되어 직접 사용이 가능하다.
  */
 public class StringUtil {
+
+	public static String encode(String param) throws UnsupportedEncodingException {
+		if(isNull(param))
+			return "";
+		else
+			return URLEncoder.encode(param, "UTF-8");
+	}
+
+	public static String makeString(Object ...strings) {
+		StringBuffer sb = new StringBuffer();
+
+		for(Object str : strings) {
+			sb.append(str);
+		}
+
+		return sb.toString();
+	}
+
 	public static String integerToStringWithCipher(int num, int cipher) {
 		String str = Integer.toString(num);
 		
@@ -34,6 +55,28 @@ public class StringUtil {
 		SimpleDateFormat formatter = new SimpleDateFormat(pattern);
 		String result = formatter.format(date);
 		return result;
+	}
+
+	public static boolean isNotEmpty(Object obj){
+
+		if(isNull(obj))
+			return false;
+
+		if(obj instanceof Number){
+			return true;
+		}else if(obj instanceof String){
+			return ((String)obj).isEmpty()? false : true;
+		}else if(obj instanceof Collection){
+			return ((Collection<?>)obj).isEmpty()? false : true;
+		}else if(obj instanceof Map<?,?>){
+			return ((Map<?,?>)obj).isEmpty()? false : true;
+		}else if(obj instanceof JsonPrimitive){
+			String str = ((JsonPrimitive)obj).getAsString();
+
+			return (str.isEmpty())? false : true;
+		}
+
+		return (obj.toString().isEmpty())? false : true;
 	}
 
 	public static int stringToMinimizedInterger(String str, int minimum){
