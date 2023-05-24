@@ -13,7 +13,6 @@ import java.io.File;
 public class FileInfo {
 
 	public File file;
-
 	public String extension;
 	public String baseName;
 
